@@ -22,6 +22,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.messenger4j.Messenger;
@@ -99,22 +101,26 @@ public class SendController {
 	 * Callback endpoint responsible for processing the inbound messages and events.
 	 */
 	@RequestMapping(method = RequestMethod.GET)
-	private void handleTextMessageEvent() {
+	private @ResponseBody String handleTextMessageEvent(@RequestParam("sendId") String sendId) {
 		logger.debug("Received TextMessageEvent");
 
 		final String messageId = "ID Bidon";
 		final String messageText = "Bonjour monsieur";
-		final String senderId = "2326414117386988";
+		final String senderId = sendId; // "2326414117386988";
 		final Instant timestamp = Instant.now();
 
 		logger.info("Received message '{}' with text '{}' from user '{}' at '{}'", messageId, messageText, senderId,
 				timestamp);
 
 		try {
-			sendGifMessage(senderId);
+//			sendGifMessage(senderId);
+			sendReceiptMessage(senderId);
+
 		} catch (MessengerApiException | MessengerIOException | MalformedURLException e) {
 			handleSendException(e);
+			return "Error : " + e.getMessage();
 		}
+		return "Message sent to "+ senderId;
 	}
 
 	private void sendUserDetails(String recipientId) throws MessengerApiException, MessengerIOException {
