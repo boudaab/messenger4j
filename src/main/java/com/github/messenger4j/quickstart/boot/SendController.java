@@ -15,13 +15,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.mockito.internal.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +33,8 @@ import com.github.messenger4j.Messenger;
 import com.github.messenger4j.common.WebviewHeightRatio;
 import com.github.messenger4j.exception.MessengerApiException;
 import com.github.messenger4j.exception.MessengerIOException;
-import com.github.messenger4j.exception.MessengerVerificationException;
+import com.github.messenger4j.quickstart.boot.model.Message;
+import com.github.messenger4j.quickstart.boot.model.MessageResponse;
 import com.github.messenger4j.send.MessagePayload;
 import com.github.messenger4j.send.MessagingType;
 import com.github.messenger4j.send.NotificationType;
@@ -69,7 +73,6 @@ import com.github.messenger4j.webhook.event.MessageReadEvent;
 import com.github.messenger4j.webhook.event.OptInEvent;
 import com.github.messenger4j.webhook.event.PostbackEvent;
 import com.github.messenger4j.webhook.event.QuickReplyMessageEvent;
-import com.github.messenger4j.webhook.event.TextMessageEvent;
 import com.github.messenger4j.webhook.event.attachment.Attachment;
 import com.github.messenger4j.webhook.event.attachment.LocationAttachment;
 import com.github.messenger4j.webhook.event.attachment.RichMediaAttachment;
@@ -100,7 +103,7 @@ public class SendController {
 	/**
 	 * Callback endpoint responsible for processing the inbound messages and events.
 	 */
-	@RequestMapping(method = RequestMethod.GET)
+	@GetMapping
 	private @ResponseBody String handleTextMessageEvent(@RequestParam("sendId") String sendId) {
 		logger.debug("Received TextMessageEvent");
 
@@ -113,14 +116,103 @@ public class SendController {
 				timestamp);
 
 		try {
-//			sendGifMessage(senderId);
+			// sendGifMessage(senderId);
 			sendReceiptMessage(senderId);
 
 		} catch (MessengerApiException | MessengerIOException | MalformedURLException e) {
 			handleSendException(e);
 			return "Error : " + e.getMessage();
 		}
-		return "Message sent to "+ senderId;
+		return "Message sent to " + senderId;
+	}
+
+	@PostMapping(value = "/{sendId}")
+	private @ResponseBody MessageResponse postMessage(@PathVariable("sendId") String sendId,
+			@RequestBody Message message) {
+		logger.debug("Received PostMessage with sendId : {}, message : {}", sendId, message);
+		MessageResponse response = new MessageResponse();
+
+		final String messageId = "" + message.getMessageId();
+		final String messageText = "Object:" + message.getObject() + ", Message:" + message.getMessage();
+		final String senderId = sendId; // "2326414117386988";
+		final Instant timestamp = Instant.now();
+
+		try {
+			if(null==message.getMessage_auto())
+				message.setMessage_auto("");
+			switch (message.getMessage_auto().trim().toLowerCase()) {
+			case "user":
+				sendUserDetails(senderId);
+				break;
+
+			case "image":
+				sendImageMessage(senderId);
+				break;
+
+			case "gif":
+				sendGifMessage(senderId);
+				break;
+
+			case "audio":
+				sendAudioMessage(senderId);
+				break;
+
+			case "video":
+				sendVideoMessage(senderId);
+				break;
+
+			case "file":
+				sendFileMessage(senderId);
+				break;
+
+			case "button":
+				sendButtonMessage(senderId);
+				break;
+
+			case "generic":
+				sendGenericMessage(senderId);
+				break;
+
+			case "list":
+				sendListMessageMessage(senderId);
+				break;
+
+			case "receipt":
+				sendReceiptMessage(senderId);
+				break;
+
+			case "quick reply":
+				sendQuickReply(senderId);
+				break;
+
+			case "read receipt":
+				sendReadReceipt(senderId);
+				break;
+
+			case "typing on":
+				sendTypingOn(senderId);
+				break;
+
+			case "typing off":
+				sendTypingOff(senderId);
+				break;
+
+			case "account linking":
+				sendAccountLinking(senderId);
+				break;
+
+			default:
+				sendTextMessage(senderId, messageText);
+			}
+
+		} catch (Exception e) {
+
+			response.setError(true);
+			response.setCode(1230);
+			response.setLibelle(e.getMessage());
+		}
+		response.setMessage(message);
+		return response;
 	}
 
 	private void sendUserDetails(String recipientId) throws MessengerApiException, MessengerIOException {
