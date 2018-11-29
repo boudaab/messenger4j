@@ -1,7 +1,10 @@
 package com.github.messenger4j.quickstart.boot;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,13 +21,15 @@ public class DbController {
 	ConversationRepository conversationRepository;
 
 	@GetMapping
-	private @ResponseBody String handleTextMessageEvent(@RequestParam("id") Integer id) {
-		System.out.println("debut");
-		conversationRepository.save(new Conversation("AZE",2,"RTY"));
+	private @ResponseBody Iterable<Conversation> findAll() {
+		return conversationRepository.findAll();
 		
-		for (Conversation conv : conversationRepository.findAll()) {
-			System.out.println(conv);
-		}
-		return "Rien";
 	}
+	
+	@GetMapping("/{id}")
+	private @ResponseBody List<Conversation> findByPsid(@PathVariable String id) {
+		return conversationRepository.findByPsid(id);
+		
+	}
+
 }
