@@ -31,6 +31,8 @@ import com.github.messenger4j.Messenger;
 import com.github.messenger4j.common.WebviewHeightRatio;
 import com.github.messenger4j.exception.MessengerApiException;
 import com.github.messenger4j.exception.MessengerIOException;
+import com.github.messenger4j.quickstart.boot.dao.ConversationRepository;
+import com.github.messenger4j.quickstart.boot.model.Conversation;
 import com.github.messenger4j.quickstart.boot.model.Message;
 import com.github.messenger4j.quickstart.boot.model.MessageResponse;
 import com.github.messenger4j.send.MessagePayload;
@@ -94,6 +96,9 @@ public class SendController {
 	private final Messenger messenger;
 
 	@Autowired
+	public ConversationRepository conversationRepository;
+	
+	@Autowired
 	public SendController(final Messenger messenger) {
 		this.messenger = messenger;
 	}
@@ -112,7 +117,6 @@ public class SendController {
 
 		logger.info("Received message '{}' with text '{}' from user '{}' at '{}'", messageId, messageText, senderId,
 				timestamp);
-
 		try {
 			// sendGifMessage(senderId);
 			sendReceiptMessage(senderId);
@@ -134,6 +138,7 @@ public class SendController {
 		final String messageText = "Object:" + message.getObject() + ", Message:" + message.getMessage();
 		final String senderId = sendId; // "2326414117386988";
 		final Instant timestamp = Instant.now();
+        conversationRepository.save(new Conversation(sendId, 1, messageText));
 
 		try {
 			if(null==message.getMessage_auto())

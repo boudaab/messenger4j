@@ -16,6 +16,8 @@ import com.github.messenger4j.common.WebviewHeightRatio;
 import com.github.messenger4j.exception.MessengerApiException;
 import com.github.messenger4j.exception.MessengerIOException;
 import com.github.messenger4j.exception.MessengerVerificationException;
+import com.github.messenger4j.quickstart.boot.dao.ConversationRepository;
+import com.github.messenger4j.quickstart.boot.model.Conversation;
 import com.github.messenger4j.send.MessagePayload;
 import com.github.messenger4j.send.MessagingType;
 import com.github.messenger4j.send.NotificationType;
@@ -93,6 +95,9 @@ public class MessengerPlatformCallbackHandler {
     private static final Logger logger = LoggerFactory.getLogger(MessengerPlatformCallbackHandler.class);
 
     private final Messenger messenger;
+    
+    @Autowired
+    public ConversationRepository conversationRepository;
 
     @Autowired
     public MessengerPlatformCallbackHandler(final Messenger messenger) {
@@ -162,6 +167,8 @@ public class MessengerPlatformCallbackHandler {
         final String senderId = event.senderId();
         final Instant timestamp = event.timestamp();
 
+        conversationRepository.save(new Conversation(senderId, 0, messageText));
+        
         logger.info("Received message '{}' with text '{}' from user '{}' at '{}'", messageId, messageText, senderId, timestamp);
 
         try {

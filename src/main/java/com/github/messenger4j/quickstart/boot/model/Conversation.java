@@ -1,11 +1,29 @@
 package com.github.messenger4j.quickstart.boot.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class Conversation {
 
+	@Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
 	int id;
 	String psid;
 	int noeud;
 	String response;
+	
+	
+	public Conversation() {
+	}
+		
+	public Conversation(String psid, int noeud, String response) {
+		this.psid = psid;
+		this.noeud = noeud;
+		this.response = response;
+	}
 	public int getId() {
 		return id;
 	}
