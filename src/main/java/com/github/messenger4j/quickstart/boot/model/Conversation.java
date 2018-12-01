@@ -27,6 +27,14 @@ public class Conversation {
 		this.noeud = noeud;
 		this.response = response;
 	}
+	public LocalDate getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(LocalDate timestamp) {
+		this.timestamp = timestamp;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -53,7 +61,8 @@ public class Conversation {
 	}
 	@Override
 	public String toString() {
-		return "Conversation [id=" + id + ", psid=" + psid + ", noeud=" + noeud + ", response=" + response + "]";
+		return "Conversation [id=" + id + ", timestamp=" + timestamp + ", psid=" + psid + ", noeud=" + noeud
+				+ ", response=" + response + "]";
 	}
 	
 	
