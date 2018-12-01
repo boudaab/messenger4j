@@ -13,7 +13,7 @@ public class Conversation {
 	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)
 	int id;
-	LocalDate timestamp;
+	LocalDate timestamp = LocalDate.now();
 	String psid;
 	int noeud;
 	String response;
