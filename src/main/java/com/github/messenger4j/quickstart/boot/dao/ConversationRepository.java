@@ -10,6 +10,6 @@ import com.github.messenger4j.quickstart.boot.model.Conversation;
 @Repository
 public interface ConversationRepository extends CrudRepository<Conversation, Integer> {
 	Iterable<Conversation> findAll();
-	List<Conversation> findByPsid(String id);
+	List<Conversation> findByPsidOrderByPsidDesc(String id);
 	
 }

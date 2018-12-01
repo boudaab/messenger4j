@@ -28,8 +28,7 @@ public class DbController {
 	
 	@GetMapping("/{id}")
 	private @ResponseBody List<Conversation> findByPsid(@PathVariable String id) {
-		return conversationRepository.findByPsid(id);
-		
+		return conversationRepository.findByPsidOrderByPsidDesc(id);		
 	}
 
 }

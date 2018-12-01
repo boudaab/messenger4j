@@ -67,6 +67,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import javax.persistence.OrderBy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,6 +170,11 @@ public class MessengerPlatformCallbackHandler {
         final String senderId = event.senderId();
         final Instant timestamp = event.timestamp();
 
+        List<Conversation> list = conversationRepository.findByPsidOrderByPsidDesc(senderId);
+
+        if(list.size()>0)
+        	logger.info("Last message : "+list.get(0));
+        
         conversationRepository.save(new Conversation(senderId, 0, messageText));
         
         logger.info("Received message '{}' with text '{}' from user '{}' at '{}'", messageId, messageText, senderId, timestamp);

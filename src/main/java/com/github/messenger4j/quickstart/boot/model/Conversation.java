@@ -1,10 +1,11 @@
 package com.github.messenger4j.quickstart.boot.model;
 
+import java.time.LocalDate;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class Conversation {
@@ -12,6 +13,7 @@ public class Conversation {
 	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)
 	int id;
+	LocalDate timestamp;
 	String psid;
 	int noeud;
 	String response;
