@@ -288,11 +288,11 @@ public class MessengerPlatformCallbackHandler {
 
     private void sendButtonMessage(String recipientId) throws MessengerApiException, MessengerIOException, MalformedURLException {
         final List<Button> buttons = Arrays.asList(
-                UrlButton.create("Open Web URL", new URL("https://www.oculus.com/en-us/rift/"), of(WebviewHeightRatio.COMPACT), of(false), empty(), empty()),
-                PostbackButton.create("Trigger Postback", "DEVELOPER_DEFINED_PAYLOAD"), CallButton.create("Call Phone Number", "+16505551234")
+                UrlButton.create("Consulter la fiche VILLAGE Agadir", new URL("https://www.clubmed.fr/r/Agadir/y"), of(WebviewHeightRatio.COMPACT), of(false), empty(), empty()),
+                PostbackButton.create("Reprendre votre process de réservation", "https://www.clubmed.fr/booking/accommodation?proposalIds=104700413&proposalIds=104700412&product=AGAC&selectedProposalId=104700413"), CallButton.create("Demander conseil à un vendeur", "0810810810")
         );
 
-        final ButtonTemplate buttonTemplate = ButtonTemplate.create("Tap a button", buttons);
+        final ButtonTemplate buttonTemplate = ButtonTemplate.create("Faites votre choix", buttons);
         final TemplateMessage templateMessage = TemplateMessage.create(buttonTemplate);
         final MessagePayload messagePayload = MessagePayload.create(recipientId, MessagingType.RESPONSE, templateMessage);
         this.messenger.send(messagePayload);

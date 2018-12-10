@@ -172,6 +172,10 @@ public class SendController {
 				sendButtonMessage(senderId);
 				break;
 
+			case "clubmed":
+				sendButtonMessageClubmed(senderId);
+				break;
+	
 			case "generic":
 				sendGenericMessage(senderId);
 				break;
@@ -283,6 +287,20 @@ public class SendController {
 		this.messenger.send(messagePayload);
 	}
 
+    private void sendButtonMessageClubmed(String recipientId) throws MessengerApiException, MessengerIOException, MalformedURLException {
+        final List<Button> buttons = Arrays.asList(
+                UrlButton.create("Voir Agadir", new URL("https://www.clubmed.fr/r/Agadir/y"), of(WebviewHeightRatio.COMPACT), of(false), empty(), empty()),
+                UrlButton.create("Continuer ma réservation", new URL("https://www.clubmed.fr/booking/accommodation?proposalIds=104700413&proposalIds=104700412&product=AGAC&selectedProposalId=104700413"), of(WebviewHeightRatio.COMPACT), of(false), empty(), empty()),
+        		CallButton.create("Parler à un vendeur", "+33810810810")
+        );
+
+        final ButtonTemplate buttonTemplate = ButtonTemplate.create("Faites votre choix", buttons);
+        final TemplateMessage templateMessage = TemplateMessage.create(buttonTemplate);
+        final MessagePayload messagePayload = MessagePayload.create(recipientId, MessagingType.RESPONSE, templateMessage);
+        this.messenger.send(messagePayload);
+    }
+
+	
 	private void sendGenericMessage(String recipientId)
 			throws MessengerApiException, MessengerIOException, MalformedURLException {
 		List<Button> riftButtons = new ArrayList<>();
