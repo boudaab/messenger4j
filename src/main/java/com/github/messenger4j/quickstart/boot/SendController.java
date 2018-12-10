@@ -130,7 +130,7 @@ public class SendController {
 		return "Message sent to " + senderId;
 	}
 
-	@PostMapping(value = "/to/all")
+	@GetMapping(value = "/to/all")
 	private @ResponseBody MessageResponse postMessageToAll(@RequestBody Message message) {
 		logger.debug("Received PostMessage with message : {}", message);
 		MessageResponse response = new MessageResponse();
