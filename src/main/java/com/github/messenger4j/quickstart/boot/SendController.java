@@ -13,7 +13,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +99,7 @@ public class SendController {
 
 	@Autowired
 	public ConversationRepository conversationRepository;
-	
+
 	@Autowired
 	public SendController(final Messenger messenger) {
 		this.messenger = messenger;
@@ -128,6 +130,41 @@ public class SendController {
 		return "Message sent to " + senderId;
 	}
 
+	@PostMapping(value = "/to/all")
+	private @ResponseBody MessageResponse postMessageToAll(@RequestBody Message message) {
+		logger.debug("Received PostMessage with message : {}", message);
+		MessageResponse response = new MessageResponse();
+
+		final String messageId = "" + message.getMessageId();
+		final String messageText = "Object:" + message.getObject() + ", Message:" + message.getMessage();
+		final String senderId = "2326414117386988";
+		final Instant timestamp = Instant.now();
+
+		Map<String, String> map = new HashMap<String, String>();
+		for (Conversation conv : conversationRepository.findAll()) {
+			if (!map.containsKey(conv.getPsid()))
+				map.put(conv.getPsid(), "0");
+		}
+
+		try {
+			for (String psid : map.keySet()) {
+				if(psid.equals("ALL"))
+					continue;
+				sendButtonMessageClubmed(psid);
+			}
+		} catch (Exception e) {
+
+			response.setError(true);
+			response.setCode(1230);
+			response.setLibelle(e.getMessage());
+		}
+
+		conversationRepository.save(new Conversation("ALL", 999, messageText));
+
+		response.setMessage(message);
+		return response;
+	}
+
 	@PostMapping(value = "/{sendId}")
 	private @ResponseBody MessageResponse postMessage(@PathVariable("sendId") String sendId,
 			@RequestBody Message message) {
@@ -138,10 +175,10 @@ public class SendController {
 		final String messageText = "Object:" + message.getObject() + ", Message:" + message.getMessage();
 		final String senderId = sendId; // "2326414117386988";
 		final Instant timestamp = Instant.now();
-        conversationRepository.save(new Conversation(sendId, 1, messageText));
+		conversationRepository.save(new Conversation(sendId, 1, messageText));
 
 		try {
-			if(null==message.getMessage_auto())
+			if (null == message.getMessage_auto())
 				message.setMessage_auto("");
 			switch (message.getMessage_auto().trim().toLowerCase()) {
 			case "user":
@@ -175,7 +212,7 @@ public class SendController {
 			case "clubmed":
 				sendButtonMessageClubmed(senderId);
 				break;
-	
+
 			case "generic":
 				sendGenericMessage(senderId);
 				break;
@@ -287,20 +324,23 @@ public class SendController {
 		this.messenger.send(messagePayload);
 	}
 
-    private void sendButtonMessageClubmed(String recipientId) throws MessengerApiException, MessengerIOException, MalformedURLException {
-        final List<Button> buttons = Arrays.asList(
-                UrlButton.create("Voir Agadir", new URL("https://www.clubmed.fr/r/Agadir/y"), of(WebviewHeightRatio.COMPACT), of(false), empty(), empty()),
-                UrlButton.create("Continuer ma réservation", new URL("https://www.clubmed.fr/booking/accommodation?proposalIds=104700413&proposalIds=104700412&product=AGAC&selectedProposalId=104700413"), of(WebviewHeightRatio.COMPACT), of(false), empty(), empty()),
-        		CallButton.create("Parler à un vendeur", "+33810810810")
-        );
+	private void sendButtonMessageClubmed(String recipientId)
+			throws MessengerApiException, MessengerIOException, MalformedURLException {
+		final List<Button> buttons = Arrays.asList(
+				UrlButton.create("Voir Agadir", new URL("https://www.clubmed.fr/r/Agadir/y"),
+						of(WebviewHeightRatio.COMPACT), of(false), empty(), empty()),
+				UrlButton.create("Continuer ma réservation", new URL(
+						"https://www.clubmed.fr/booking/accommodation?proposalIds=104700413&proposalIds=104700412&product=AGAC&selectedProposalId=104700413"),
+						of(WebviewHeightRatio.COMPACT), of(false), empty(), empty()),
+				CallButton.create("Parler à un vendeur", "+33810810810"));
 
-        final ButtonTemplate buttonTemplate = ButtonTemplate.create("Faites votre choix", buttons);
-        final TemplateMessage templateMessage = TemplateMessage.create(buttonTemplate);
-        final MessagePayload messagePayload = MessagePayload.create(recipientId, MessagingType.RESPONSE, templateMessage);
-        this.messenger.send(messagePayload);
-    }
+		final ButtonTemplate buttonTemplate = ButtonTemplate.create("Faites votre choix", buttons);
+		final TemplateMessage templateMessage = TemplateMessage.create(buttonTemplate);
+		final MessagePayload messagePayload = MessagePayload.create(recipientId, MessagingType.RESPONSE,
+				templateMessage);
+		this.messenger.send(messagePayload);
+	}
 
-	
 	private void sendGenericMessage(String recipientId)
 			throws MessengerApiException, MessengerIOException, MalformedURLException {
 		List<Button> riftButtons = new ArrayList<>();
