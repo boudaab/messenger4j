@@ -131,7 +131,11 @@ public class SendController {
 	}
 
 	@GetMapping(value = "/to/all")
-	private @ResponseBody MessageResponse postMessageToAll(@RequestBody Message message) {
+	private @ResponseBody MessageResponse postMessageToAll() {
+		Message message = new Message();
+		message.setMessage("Send to ALL");
+		message.setMessage_auto("clubmed");
+		message.setPhone("0000");
 		logger.debug("Received PostMessage with message : {}", message);
 		MessageResponse response = new MessageResponse();
 
